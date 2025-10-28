@@ -1,85 +1,70 @@
+import face_recognition
 import cv2
-from deepface import DeepFace
+import numpy as np
 import os
-
-KNOWN_FACES_DIR = "./faces"
-frame_count = 0
-label = "Initialization..."
-color = (255, 255, 0)
-face_location = None
 
 video_capture = cv2.VideoCapture(0)
 
+oskar_grebin_image = face_recognition.load_image_file("./faces/Oskar Grebin.jpg", mode='RGB')
+oskar_grebin_face_encoding = face_recognition.face_encodings(oskar_grebin_image)[0]
+
+known_face_encodings = []
+known_face_names = []
+
+for file in os.listdir("./faces"):
+    if file.lower().endswith((".jpg", ".jpeg", ".png")):
+        path = os.path.join("./faces", file)
+
+        image = face_recognition.load_image_file(path, mode='RGB')
+        encodings = face_recognition.face_encodings(image)
+
+        known_face_encodings.append(encodings[0])
+        known_face_names.append(os.path.splitext(file)[0])
+
+face_locations = []
+face_encodings = []
+face_names = []
+process_this_frame = True
+
 while True:
     ret, frame = video_capture.read()
-    
-    frame_count += 1
-    
-    if frame_count % 30 == 0:
-        try:
-            # First detect face location
-            face_objs = DeepFace.extract_faces(img_path=frame, detector_backend='opencv', enforce_detection=False)
-            
-            if face_objs and len(face_objs) > 0:
-                # Get the facial area (x, y, w, h)
-                facial_area = face_objs[0]['facial_area']
-                face_location = (facial_area['x'], facial_area['y'], facial_area['w'], facial_area['h'])
-                
-                # Now try to find matching face
-                results = DeepFace.find(img_path=frame, db_path=KNOWN_FACES_DIR, enforce_detection=False, silent=True, model_name='VGG-Face', detector_backend='opencv')
-                
-                # Check if any faces were found
-                if results and len(results) > 0 and len(results[0]) > 0:
-                    # Get the first result DataFrame
-                    first_result = results[0]
-                    
-                    # Get the best match (first row)
-                    match_path = first_result.iloc[0]['identity']
-                    distance = first_result.iloc[0]['distance']
-                    
-                    # Extract name from path
-                    name = os.path.splitext(os.path.basename(match_path))[0]
-                    
-                    label = f"{name} ({distance:.2f})"
-                    color = (0, 255, 0)
-                else:
-                    label = "Nieznana twarz"
-                    color = (0, 0, 255)
-            else:
-                label = "Brak twarzy"
-                color = (0, 0, 255)
-                face_location = None
-                
-        except Exception as e:
-            label = f"Blad: {str(e)[:30]}"
-            color = (0, 0, 255)
-            face_location = None
-    
-    # Draw rectangle around face if detected
-    if face_location:
-        x, y, w, h = face_location
-        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+
+    if process_this_frame:
+        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+
+        rgb_small_frame = np.ascontiguousarray(small_frame)
         
-        # Draw label below the rectangle
-        label_y = y + h + 20
-        
-        # Draw background for text (for better visibility)
-        (text_width, text_height), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
-        cv2.rectangle(frame, (x - 1, label_y - text_height - 5), (x + text_width + 10, label_y + baseline), color, -1)
-        
-        # Draw text
-        cv2.putText(frame, label, (x + 5, label_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-    
-    # Draw frame counter in corner
-    cv2.putText(frame, f"Frame: {frame_count}", (30, frame.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-    
-    cv2.imshow("Students Surveillance System", frame)
-    
-    # Check for window close
-    cv2.waitKey(1)
-    if cv2.getWindowProperty("Students Surveillance System", cv2.WND_PROP_VISIBLE) < 1:
+        face_locations = face_recognition.face_locations(rgb_small_frame)
+        face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+
+        face_names = []
+        for face_encoding in face_encodings:
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+            name = "Unknown"
+
+            face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+            best_match_index = np.argmin(face_distances)
+            if matches[best_match_index]:
+                name = known_face_names[best_match_index]
+
+            face_names.append(name)
+
+    process_this_frame = not process_this_frame
+
+    for (top, right, bottom, left), name in zip(face_locations, face_names):
+        top *= 4
+        right *= 4
+        bottom *= 4
+        left *= 4
+
+        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+        cv2.rectangle(frame, (left, bottom), (right, bottom - 35), (0, 0, 255), cv2.FILLED)
+        cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255), 1)
+
+    cv2.imshow('Students Surveillance System', frame)
+
+    if cv2.waitKey(1) and cv2.getWindowProperty('Students Surveillance System', cv2.WND_PROP_VISIBLE) == 0:
         break
 
 video_capture.release()
 cv2.destroyAllWindows()
-print("Program terminated")
