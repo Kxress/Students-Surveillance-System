@@ -5,9 +5,6 @@ import os
 
 video_capture = cv2.VideoCapture(0)
 
-oskar_grebin_image = face_recognition.load_image_file("./faces/Oskar Grebin.jpg", mode='RGB')
-oskar_grebin_face_encoding = face_recognition.face_encodings(oskar_grebin_image)[0]
-
 known_face_encodings = []
 known_face_names = []
 
@@ -23,7 +20,6 @@ for file in os.listdir("./faces"):
 
 face_locations = []
 face_encodings = []
-face_names = []
 process_this_frame = True
 
 while True:
@@ -60,6 +56,8 @@ while True:
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
         cv2.rectangle(frame, (left, bottom), (right, bottom - 35), (0, 0, 255), cv2.FILLED)
         cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255), 1)
+
+    
 
     cv2.imshow('Students Surveillance System', frame)
 
