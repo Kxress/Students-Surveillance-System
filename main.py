@@ -20,10 +20,15 @@ for file in os.listdir("./faces"):
 
 face_locations = []
 face_encodings = []
-process_this_frame = True
+process_this_frame = False
+
+face_names = []
 
 while True:
     ret, frame = video_capture.read()
+
+    if ret and frame is not None:
+        process_this_frame = True
 
     if process_this_frame:
         small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
@@ -33,7 +38,6 @@ while True:
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-        face_names = []
         for face_encoding in face_encodings:
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
             name = "Unknown"
@@ -45,9 +49,14 @@ while True:
 
             face_names.append(name)
 
+            if len(face_names) >= 5 and len(set(face_names[-5:])) == 1:
+                print("Ostatnie 5 zarejestrowany twarzy to: " + face_names[-1])
+
     process_this_frame = not process_this_frame
 
-    for (top, right, bottom, left), name in zip(face_locations, face_names):
+    if face_locations and face_names:
+        (top, right, bottom, left), name = face_locations[-1], face_names[-1]
+
         top *= 4
         right *= 4
         bottom *= 4
@@ -56,8 +65,6 @@ while True:
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
         cv2.rectangle(frame, (left, bottom), (right, bottom - 35), (0, 0, 255), cv2.FILLED)
         cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255), 1)
-
-    
 
     cv2.imshow('Students Surveillance System', frame)
 
