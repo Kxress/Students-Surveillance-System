@@ -2,6 +2,7 @@ import face_recognition
 import cv2
 import numpy as np
 import os
+import messagebox
 
 video_capture = cv2.VideoCapture(0)
 
@@ -23,8 +24,22 @@ face_encodings = []
 face_names = []
 
 process_this_frame = True
-
 rect_color = (0, 255, 255)
+
+def confirm_face():
+    global face_names
+
+    if len(face_names) >= 5:
+        face_names = face_names[-5:]
+
+        if len(set(face_names)) == 1:
+            if face_names[0] != "Unknown":
+                if messagebox.askyesno("Wykryto twarz", f"Wykryto twarz: {face_names[0]}. Czy twarz się zgadza?"):
+                    messagebox.showinfo("Obecność zatwierdzona", "Zatwierdzono obecność! Kliknij OK by zeskanować następną twarz.")
+            else:
+                messagebox.askyesno("Nieznana twarz", "Nie wykryto twarzy. Być może nie istnieje ona w bazie danych. Czy dodać twarz do bazy?")
+
+            face_names.clear()
 
 while True:
     ret, frame = video_capture.read()
@@ -53,14 +68,6 @@ while True:
 
             face_names.append(name)
 
-            if len(face_names) > 5:
-                face_names = face_names[-5:]
-
-            if len(face_names) == 5 and len(set(face_names)) == 1:
-                rect_color = (0, 255, 0)
-            else:
-                rect_color = (0, 255, 255)
-
     process_this_frame = not process_this_frame
 
 
@@ -72,9 +79,11 @@ while True:
         bottom *= 4
         left *= 4
 
-        cv2.rectangle(frame, (left, top), (right, bottom), rect_color, 2)
-        cv2.rectangle(frame, (left, bottom), (right, bottom - 35), rect_color, cv2.FILLED)
+        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+        cv2.rectangle(frame, (left, bottom), (right, bottom - 35), (0, 0, 255), cv2.FILLED)
         cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255), 1)
+
+        confirm_face()
     elif face_encodings_len > 1:
         cv2.putText(frame, "WYKRYTO WIECEJ NIZ JEDNA TWARZ", (30, 450), cv2.FONT_HERSHEY_DUPLEX, 1.0, (0, 0, 255), 2)
 
