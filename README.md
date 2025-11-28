@@ -17,8 +17,5 @@ OpenCV:
 pip install opencv-python
 
 NumPy:
-pip uninstall numpy
+pip uninstall numpy -y
 pip install numpy==1.23.5
-
-messagebox:
-pip install messagebox

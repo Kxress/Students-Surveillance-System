@@ -44,26 +44,29 @@ def confirm_face():
             if face_names[0] != "Unknown":
                 current_datetime = datetime.datetime.now()
                 current_time = current_datetime.time()
-                current_period = 0
+                current_period_idx = 0
 
                 for i in range(len(period_times)):
                     if current_time < period_times[i]:
-                        current_period = i + 1
+                        current_period_idx = i - 1
                         break
 
                 if face_names[0] not in present and face_names[0] not in late:
-                    present.append(face_names[0]) if datetime.timedelta(hours=current_time.hour, minutes=current_time.minute) - datetime.timedelta(hours=period_times[current_period].hour, minutes=period_times[current_period].minute) <= datetime.timedelta(minutes=15) else late.append(face_names[0])
+                    present.append(face_names[0]) if datetime.timedelta(hours=current_time.hour, minutes=current_time.minute) - datetime.timedelta(hours=period_times[current_period_idx].hour, minutes=period_times[current_period_idx].minute) <= datetime.timedelta(minutes=15) else late.append(face_names[0])
 
-                with open(f"{current_datetime.strftime('%d.%m')} ({days_pl[current_datetime.weekday()]}) - Lekcja {current_period} - {grade}.txt", "w") as file:
+                with open(f"{current_datetime.strftime('%d.%m')} ({days_pl[current_datetime.weekday()]}) - Lekcja {current_period_idx + 1} - {grade}.txt", "w") as file:
                     file.write("Obecni:\n\n" + "\n".join(present) + "\n\n\nSpóźnienia:\n\n" + "\n".join(late))
             else:
-                messagebox.askyesno("Nieznana twarz", "Nie wykryto twarzy. Być może nie istnieje ona w bazie danych. Czy dodać twarz do bazy?")
+                if messagebox.askyesno("Nieznana twarz", "Nie wykryto twarzy. Być może nie istnieje ona w bazie danych. Czy dodać twarz do bazy?"):
+                    ret, frame = video_capture.read()
+                    name = simpledialog.askstring("Dane", "Podaj imię i nazwisko:")
+                    cv2.imwrite(f"faces/{name}.jpg", frame)
 
             face_names.clear()
 
 grade = simpledialog.askstring("Klasa", "Podaj nazwę klasy:")
 
-if grade == "":
+if grade == "" or grade is None:
     sys.exit()
 
 while True:
