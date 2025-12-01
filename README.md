@@ -1,28 +1,20 @@
-### Tools necessary to run the program:
+# Students Surveillance System (SSS)
 
-Python:
-https://www.python.org/downloads/release/python-3119/
+A Python-based face recognition system for tracking student attendance.
 
-CMake:
-https://cmake.org/download/
-pip install cmake
+---
 
-dlib:
-https://github.com/z-mahmud22/Dlib_Windows_Python3.x
+## Installation
 
-face_recognition:
-pip install face_recognition
+You can install and run the program in two ways:
 
-OpenCV:
-pip install opencv-python
+### 1. Using the GitHub Repository
 
-NumPy:
-pip uninstall numpy -y
-pip install numpy==1.23.5
+1. **Clone the repository:**
 
-keyboard:
-pip install keyboard
-
+```bash
+git clone https://github.com/your-username/Students-Surveillance-System.git
+cd Students-Surveillance-System
 
 ### Keyboard shortcuts:
 
