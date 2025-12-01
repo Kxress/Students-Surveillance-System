@@ -19,3 +19,13 @@ pip install opencv-python
 NumPy:
 pip uninstall numpy -y
 pip install numpy==1.23.5
+
+keyboard:
+pip install keyboard
+
+
+### Keyboard shortcuts:
+
+Alt + P – Choose folder to save face images
+Alt + C – Enter the class name
+Alt + T – Set the maximum minutes a person is considered present
