@@ -2,19 +2,7 @@
 
 A Python-based face recognition system for tracking student attendance.
 
----
-
-## Installation
-
-You can install and run the program in two ways:
-
-### 1. Using the GitHub Repository
-
-1. **Clone the repository:**
-
-```bash
-git clone https://github.com/your-username/Students-Surveillance-System.git
-cd Students-Surveillance-System
+Download the latest `.exe` (1.0) from [Releases](link-to-release).
 
 ### Keyboard shortcuts:
 
