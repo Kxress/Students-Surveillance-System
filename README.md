@@ -7,5 +7,7 @@ Download the latest `.exe` (1.0) from [Releases](https://github.com/Kxress/Stude
 ### Keyboard shortcuts:
 
 Alt + P – Choose folder to save face images
+
 Alt + C – Enter the class name
+
 Alt + T – Set the maximum minutes a person is considered present
