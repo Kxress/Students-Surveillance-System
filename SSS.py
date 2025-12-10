@@ -96,12 +96,10 @@ def confirm_face():
                         present.append(face_names[0])
                     elif current_time_formatted - period_time <= datetime.timedelta(minutes=15):
                         late.append(face_names[0])
-                    else:
-                        absent.append(face_names[0])
 
                 os.makedirs(folder_path, exist_ok=True)
                 with open(f"{folder_path}/{current_datetime.strftime('%d.%m')} ({days_pl[current_datetime.weekday()]}) - Lekcja {current_period_idx + 1} - Klasa {grade}.txt", "w") as file:
-                    file.write("Obecni:\n\n" + "\n".join(present) + "\n\n\nSpóźnienia:\n\n" + "\n".join(late) + "\n\n\nNieobecni:\n\n" + "\n".join(absent))
+                    file.write("Obecni:\n\n" + "\n".join(present) + "\n\n\nSpóźnienia:\n\n" + "\n".join(late))
 
             face_names.clear()
 
@@ -143,11 +141,13 @@ while True:
             matches = face_recognition.compare_faces(known_face_encodings, face_encodings[0], 0.5)
             face_distances = face_recognition.face_distance(known_face_encodings, face_encodings[0])
 
-            best_match_index = np.argmin(face_distances)
             name = "Nieznana twarz"
 
-            if matches[best_match_index]:
-                name = known_face_names[best_match_index]
+            if len(known_face_encodings) > 0:
+                best_match_index = np.argmin(face_distances)
+
+                if matches[best_match_index]:
+                    name = known_face_names[best_match_index]
 
             face_names.append(name)
 
