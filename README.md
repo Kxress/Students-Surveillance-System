@@ -2,7 +2,7 @@
 
 A Python-based face recognition system for tracking student attendance.
 
-Download the latest `.exe` (1.1) from [Releases](https://github.com/Kxress/Students-Surveillance-System/releases/tag/1.0).
+Download the latest `.exe` (1.1) from [Releases](https://github.com/Kxress/Students-Surveillance-System/releases).
 
 ### Keyboard shortcuts:
 
