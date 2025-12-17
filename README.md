@@ -6,7 +6,7 @@ Download the latest `.exe` (1.1) from [Releases](https://github.com/Kxress/Stude
 
 ### Keyboard shortcuts:
 
-Alt + P – Choose folder to save face images
+Alt + P – Choose folder to save attendance list
 
 Alt + C – Enter the class name
 
